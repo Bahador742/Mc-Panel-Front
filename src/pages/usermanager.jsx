@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import axios from "axios";
 import SidePanel from "../componenets/sidepanel";
 import Navbar from "../componenets/navbar";
-import Footer from "../componenets/footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTimes,
@@ -61,9 +60,8 @@ const UserManager = () => {
       if (!accessString) accessString = "0";
 
       try {
-        await axios.post(`${BaseURL}/api/account`, {
+        await axios.post(`${BaseURL}/acmgr/add`, {
           token: Token,
-          run: "create",
           access: accessString,
           user: values.username,
           pass: values.password,
@@ -71,7 +69,7 @@ const UserManager = () => {
           confirm: values.confirmPassword,
         });
 
-        const response = await axios.post(`${BaseURL}/api/account`, {
+        const response = await axios.post(`${BaseURL}/acmgr/get`, {
           token: Token,
         });
         setUsers(response.data.users || []);
@@ -89,7 +87,7 @@ const UserManager = () => {
     const fetchUsers = async () => {
       const Token = localStorage.getItem("token");
       try {
-        const response = await axios.post(`${BaseURL}/api/account`, {
+        const response = await axios.post(`${BaseURL}/acmgr/get`, {
           token: Token,
         });
         setUsers(response.data.users || []);
@@ -110,12 +108,12 @@ const UserManager = () => {
 
     const Token = localStorage.getItem("token");
     try {
-      await axios.post(`${BaseURL}/api/account`, {
+      await axios.post(`${BaseURL}/acmgr/remove`, {
         token: Token,
-        run: "delete",
+
         id: userToDelete,
       });
-      const response = await axios.post(`${BaseURL}/api/account`, {
+      const response = await axios.post(`${BaseURL}/acmgr/get`, {
         token: Token,
       });
       setUsers(response.data.users || []);
@@ -486,7 +484,6 @@ const UserManager = () => {
           </div>
         </div>
       )}
-      <Footer />
     </div>
   );
 };

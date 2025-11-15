@@ -1,5 +1,5 @@
 import NavBar from "../componenets/navbar";
-import Footer from '../componenets/footer'
+
 const NotFound = () => {
   return (
     <>
@@ -7,7 +7,6 @@ const NotFound = () => {
       <div id="notfound">
         <h1 className="rgb-motion">Page not found</h1>
       </div>
-      <Footer/>
     </>
   );
 };

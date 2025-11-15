@@ -4,14 +4,11 @@ import { useFormik } from "formik";
 import axios from "axios";
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
-
 import SidePanel from "./sidepanel";
 import NavBar from "./navbar";
 import baseURL from "../contexts/baseURL";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { createTheme } from "@uiw/codemirror-themes";
-import Footer from "./footer";
 
 const FileEditor = () => {
   const context = useContext(baseURL);
@@ -29,18 +26,16 @@ const FileEditor = () => {
       try {
         const Token = localStorage.getItem("token");
 
-        const saveResponse = await axios.post(`${BaseURL}/api/file`, {
+        const saveResponse = await axios.post(`${BaseURL}/fmgr/file/edit`, {
           token: Token,
-          run: "edit",
           ac: "write",
           file: values.originalFilename,
           content: values.content,
         });
 
         if (values.filename !== values.originalFilename) {
-          await axios.post(`${BaseURL}/api/file`, {
+          await axios.post(`${BaseURL}/fmgr/file/rename`, {
             token: Token,
-            run: "rename",
             file: values.originalFilename,
             name: values.filename,
           });
@@ -63,9 +58,8 @@ const FileEditor = () => {
       if (!context.filename) return;
       const Token = localStorage.getItem("token");
       try {
-        const response = await axios.post(`${BaseURL}/api/file`, {
+        const response = await axios.post(`${BaseURL}/fmgr/file/edit`, {
           token: Token,
-          run: "edit",
           ac: "read",
           file: context.filename,
         });
@@ -263,7 +257,6 @@ const FileEditor = () => {
           </div>
         </div>
       )}
-      <Footer />
     </>
   );
 };

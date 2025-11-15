@@ -12,7 +12,6 @@ import axios from "axios";
 import SidePanel from "../componenets/sidepanel";
 import NavBar from "../componenets/navbar";
 import BaseURLContext from "../contexts/baseURL";
-import Footer from "./footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faWarning, faX } from "@fortawesome/free-solid-svg-icons";
 
@@ -78,11 +77,10 @@ const Console = () => {
     setSending(true);
 
     try {
-      const response = await axios.post(`${BaseURL}/api/command`, {
+     await axios.post(`${BaseURL}/dashboard/command`, {
         token,
         cmd,
       });
-      console.log(response.data.alert);
     } catch (error) {
       console.error("Command error:", error);
     } finally {
@@ -165,7 +163,7 @@ const Console = () => {
           ></button>
         </div>
       </div>
-      <Footer />
+
     </div>
   );
 };

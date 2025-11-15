@@ -34,9 +34,7 @@ const SidePanel = () => {
 
   return (
     <>
-      
       <button
-        
         type="button"
         id="openOffcanvas"
         data-bs-toggle="offcanvas"
