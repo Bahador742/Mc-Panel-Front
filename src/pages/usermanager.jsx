@@ -60,8 +60,9 @@ const UserManager = () => {
       if (!accessString) accessString = "0";
 
       try {
-        await axios.post(`${BaseURL}/acmgr/add`, {
+        await axios.post(`${BaseURL}/api/account`, {
           token: Token,
+          run: "create",
           access: accessString,
           user: values.username,
           pass: values.password,
@@ -69,7 +70,7 @@ const UserManager = () => {
           confirm: values.confirmPassword,
         });
 
-        const response = await axios.post(`${BaseURL}/acmgr/get`, {
+        const response = await axios.post(`${BaseURL}/api/account`, {
           token: Token,
         });
         setUsers(response.data.users || []);
@@ -87,7 +88,7 @@ const UserManager = () => {
     const fetchUsers = async () => {
       const Token = localStorage.getItem("token");
       try {
-        const response = await axios.post(`${BaseURL}/acmgr/get`, {
+        const response = await axios.post(`${BaseURL}/api/account`, {
           token: Token,
         });
         setUsers(response.data.users || []);
@@ -108,12 +109,12 @@ const UserManager = () => {
 
     const Token = localStorage.getItem("token");
     try {
-      await axios.post(`${BaseURL}/acmgr/remove`, {
+      await axios.post(`${BaseURL}/api/account`, {
         token: Token,
-
+        run: "delete",
         id: userToDelete,
       });
-      const response = await axios.post(`${BaseURL}/acmgr/get`, {
+      const response = await axios.post(`${BaseURL}/api/account`, {
         token: Token,
       });
       setUsers(response.data.users || []);

@@ -5,7 +5,6 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import * as yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
 import baseURL from "../contexts/baseURL";
 
 const Login = () => {
@@ -33,7 +32,7 @@ const Login = () => {
       try {
         setSending(true);
         setLoginError(null);
-        const response = await axios.post(`${BaseURL}/login`, values);
+        const response = await axios.post(`${BaseURL}/api/login`, values);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem('username',values.user)
         localStorage.setItem('access',response.data.access)
@@ -148,6 +147,7 @@ const Login = () => {
           </button>
         </form>
       </div>
+
     </>
   );
 };

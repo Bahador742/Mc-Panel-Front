@@ -3,7 +3,9 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import SidePanel from "../componenets/sidepanel";
 import NavBar from "../componenets/navbar";
+
 import baseURL from "../contexts/baseURL";
+import { FixedSizeList as List } from 'react-window';
 import { faCheck, faWarning, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DashKeys from "../componenets/dashboardkeys";
@@ -24,6 +26,7 @@ const Dashboard = () => {
   const socketRef = useRef(null);
   const consoleRef = useRef(null);
   const consoleRefSM = useRef(null);
+
   const [ScreenWidth, Non] = useState(window.screen.width);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -90,10 +93,22 @@ const Dashboard = () => {
     try {
       setButtonStatus(btnType);
 
-      if (btnType === "start") {
-        await axios.post(`${BaseURL}/dashboard/start`, {token: Token});
+      if (btnType === "restart" && stats.ServerStatus === "online") {
+        await axios.post(`${BaseURL}/api/button`, {
+          token: Token,
+          btn: "stop",
+        });
+        if (stats.ServerStatus === "offline") {
+          await axios.post(`${BaseURL}/api/button`, {
+            token: Token,
+            btn: "start",
+          });
+        }
       } else {
-        await axios.post(`${BaseURL}/dashboard/stop`, {token: Token});
+        await axios.post(`${BaseURL}/api/button`, {
+          token: Token,
+          btn: btnType,
+        });
       }
     } catch (error) {
       alert(`Failed to ${btnType} server: ${error.message}`);
@@ -230,7 +245,7 @@ const Dashboard = () => {
               </div>
 
               <div id="DashBoardbuttonsdiv">
-                {["start", "stop"].map((btn) => (
+                {["start", "stop", "restart"].map((btn) => (
                   <DashKeys
                     key={btn}
                     btn={btn}
@@ -242,6 +257,7 @@ const Dashboard = () => {
             </section>
           </div>
         </div>
+       
       </div>
     </>
   );

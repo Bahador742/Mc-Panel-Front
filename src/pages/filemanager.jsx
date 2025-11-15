@@ -13,7 +13,7 @@ import {
   faFileCode,
   faBook,
   faUpload,
-  faCode,
+  faCode,  
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
@@ -22,6 +22,7 @@ import SidePanel from "../componenets/sidepanel";
 import NavBar from "../componenets/navbar";
 import baseURL from "../contexts/baseURL";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 const Filemanager = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -60,7 +61,7 @@ const Filemanager = () => {
 
   const refreshFileData = async () => {
     const Token = localStorage.getItem("token");
-    const response = await axios.post(`${BaseURL}/fmgr`, { token: Token });
+    const response = await axios.post(`${BaseURL}/api/file`, { token: Token });
     setFiles(response.data.files || []);
     setDirectory(response.data.dirs || []);
     setCwd(response.data.cwd || "");
@@ -70,7 +71,7 @@ const Filemanager = () => {
     const fetchData = async () => {
       const Token = localStorage.getItem("token");
       try {
-        const response = await axios.post(`${BaseURL}/fmgr`, {
+        const response = await axios.post(`${BaseURL}/api/file`, {
           token: Token,
         });
         setFiles(response.data.files || []);
@@ -97,7 +98,7 @@ const Filemanager = () => {
       setError(null);
       setUploadState((prev) => ({ ...prev, isUploading: true, progress: 0 }));
 
-      await axios.post(`${BaseURL}/fmgr/net/upload`, formData, {
+      await axios.post(`${BaseURL}/api/file`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -162,16 +163,18 @@ const Filemanager = () => {
 
     try {
       if (isDirectory) {
-        await axios.post(`${BaseURL}/fmgr/file/remove`, {
+        await axios.post(`${BaseURL}/api/file`, {
           token: Token,
+          run: "delete",
           dir: itemToDelete,
         });
         setDirectory((prevDir) =>
           prevDir.filter((Dir) => Dir !== itemToDelete)
         );
       } else {
-        await axios.post(`${BaseURL}/fmgr/file/remove`, {
+        await axios.post(`${BaseURL}/api/file`, {
           token: Token,
+          run: "delete",
           file: itemToDelete,
         });
         setFiles((prevFiles) =>
@@ -196,8 +199,9 @@ const Filemanager = () => {
   const handleOpeningDirectory = async (dir) => {
     if (uploadState.isUploading) return;
     const Token = localStorage.getItem("token");
-    await axios.post(`${BaseURL}/fmgr/cd`, {
+    await axios.post(`${BaseURL}/api/file`, {
       token: Token,
+      run: "go",
       dir: dir,
     });
     refreshFileData();
@@ -206,8 +210,9 @@ const Filemanager = () => {
   const handleDirectoryBackbtn = async () => {
     const Token = localStorage.getItem("token");
     setSendingBack(true);
-    await axios.post(`${BaseURL}/fmgr/cd`, {
+    await axios.post(`${BaseURL}/api/file`, {
       token: Token,
+      run: "go",
       dir: "..",
     });
     refreshFileData();
@@ -219,8 +224,9 @@ const Filemanager = () => {
     const folderName = newItemName.trim();
     if (!folderName) return;
 
-    await axios.post(`${BaseURL}/fmgr/file/create`, {
+    await axios.post(`${BaseURL}/api/file`, {
       token: Token,
+      run: "create",
       dir: folderName,
     });
 
@@ -233,8 +239,9 @@ const Filemanager = () => {
     const fileName = newItemName.trim();
     if (!fileName) return;
 
-    await axios.post(`${BaseURL}/fmgr/file/create`, {
+    await axios.post(`${BaseURL}/api/file`, {
       token: Token,
+      run: "create",
       file: fileName,
     });
 
@@ -247,8 +254,8 @@ const Filemanager = () => {
     try {
       setFilename(filename);
       const response = await axios.post(
-        `${BaseURL}/fmgr/net/download`,
-        { file: filename, token: Token },
+        `${BaseURL}/api/file`,
+        { file: filename, run: "download", token: Token },
         {
           responseType: "blob",
           onDownloadProgress: (progressEvent) => {
@@ -312,8 +319,9 @@ const Filemanager = () => {
     const Token = localStorage.getItem("token");
     const result = await axios.post(`${BaseURL}/api/file`, { token: Token });
     for (let index = 0; index < result.data.files.length; index++) {
-      await axios.post(`${BaseURL}/fmgr/file/remove`, {
+      await axios.post(`${BaseURL}/api/file`, {
         token: Token,
+        run: "delete",
         file: result.data.files[index],
       });
     }
@@ -327,8 +335,9 @@ const Filemanager = () => {
   const handeUnzip = async (file) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post(`${BaseURL}/fmgr/file/zip`, {
+      await axios.post(`${BaseURL}/api/file`, {
         token,
+        run: "zip",
         ac: "unzip",
         file,
       });
@@ -341,8 +350,9 @@ const Filemanager = () => {
   const handleZip = async (Dir) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post(`${BaseURL}/fmgr/file/zip`, {
+      await axios.post(`${BaseURL}/api/file`, {
         token,
+        run: "zip",
         ac: "zip",
         dir: Dir,
       });
@@ -397,10 +407,11 @@ const Filemanager = () => {
 
   const mv = async (file) => {
     const token = localStorage.getItem("token");
-    const response = await axios.post(`${BaseURL}/fmgr/file/move`, {
+    const response = await axios.post(`${BaseURL}/api/file`, {
       token,
       file,
       dir: inputValue,
+      run: "move",
     });
     console.log(response, baseURL);
     setInputValue("");
@@ -408,7 +419,7 @@ const Filemanager = () => {
   };
 
   const [wgetM, setWgetM] = useState(false);
-  const [wgetInp, setWgetInp] = useState("");
+  const [wgetInp ,setWgetInp] = useState('');
 
   const wget = () => {
     if (wgetM) {
@@ -418,22 +429,19 @@ const Filemanager = () => {
     }
   };
 
-  const wgetInpChange = (e) => {
-    setWgetInp(e.target.value);
-  };
+  const wgetInpChange = (e)=>{
+    setWgetInp(e.target.value)
+  }
 
-  const wgetGo = async () => {
-    const token = localStorage.getItem("token");
-    const response = await axios.post(
-      `${BaseURL}/fmgr/net/download/${wgetInp}`,
-      {
-        token,
-      }
-    );
-    setWgetInp("");
-    setWgetM(false);
-    refreshFileData();
-  };
+  const wgetGo = async()=>{
+    const token = localStorage.getItem('token')
+    const response = await axios.post(`${BaseURL}/api/file`,{token,run: 'wget',link:wgetInp})
+    console.log(response)
+    setWgetInp('')
+    setWgetM(false)
+    refreshFileData()
+  }
+
 
   return (
     <>
@@ -843,13 +851,15 @@ const Filemanager = () => {
               </div>
               <div className="modal-body">
                 <div className="form-group">
-                  <label style={{ color: "#D3D3D3" }}>URL :</label>
+                  <label style={{ color: "#D3D3D3" }}>
+                    URL :
+                  </label>
                   <input
                     type="text"
                     className="baseInp"
                     value={wgetInp}
                     onChange={wgetInpChange}
-                    placeholder="https://example.com"
+                    placeholder='https://example.com'
                     autoFocus
                   />
                 </div>
@@ -940,6 +950,7 @@ const Filemanager = () => {
         style={{ display: "none" }}
         disabled={uploadState.isUploading}
       />
+
     </>
   );
 };
